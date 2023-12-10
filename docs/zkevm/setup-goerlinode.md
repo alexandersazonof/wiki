@@ -26,7 +26,7 @@ Next, make sure you have the following commands installed:
 
 ```bash
 sudo apt update -y
-sudo apt install -y wget jq docker.io
+sudo apt install -y wget jq docker.io docker-compose
 
 sudo usermod -aG docker $USER
 newgrp docker && newgrp $USER
@@ -72,31 +72,31 @@ Additionally, you will need **an L1 Goerli address** to proceed with the setup t
          - "0.0.0.0:${L1_RPC_PORT}:8545"
          - "0.0.0.0:30303:30303/udp"
 
-   prysm:
-     image: "gcr.io/prysmaticlabs/prysm/beacon-chain:stable"
+     prysm:
+       image: "gcr.io/prysmaticlabs/prysm/beacon-chain:stable"
 
-     container_name: goerli-consensus
-     command: |
-       --prater
-       --datadir=/data
-       --jwt-secret=/geth/goerli/geth/jwtsecret
-       --rpc-host=0.0.0.0
-       --grpc-gateway-host=0.0.0.0
-       --monitoring-host=0.0.0.0
-       --execution-endpoint=/geth/goerli/geth.ipc
-       --accept-terms-of-use
-       --suggested-fee-recipient=${L1_SUGGESTED_FEE_RECIPIENT_ADDR}
-       --checkpoint-sync-url=${L1_CHECKPOINT_URL}
-     volumes:
-       - "./docker-volumes/prysm:/data"
-       - "./docker-volumes/geth:/geth"
-     ports:
-       - "0.0.0.0:3500:3500"
-       - "0.0.0.0:4000:4000"
-       - "0.0.0.0:12000:12000/udp"
-       - "0.0.0.0:13000:13000"
-     depends_on:
-       - geth
+       container_name: goerli-consensus
+       command: |
+         --prater
+         --datadir=/data
+         --jwt-secret=/geth/goerli/geth/jwtsecret
+         --rpc-host=0.0.0.0
+         --grpc-gateway-host=0.0.0.0
+         --monitoring-host=0.0.0.0
+         --execution-endpoint=/geth/goerli/geth.ipc
+         --accept-terms-of-use
+         --suggested-fee-recipient=${L1_SUGGESTED_FEE_RECIPIENT_ADDR}
+         --checkpoint-sync-url=${L1_CHECKPOINT_URL}
+       volumes:
+         - "./docker-volumes/prysm:/data"
+         - "./docker-volumes/geth:/geth"
+       ports:
+         - "0.0.0.0:3500:3500"
+         - "0.0.0.0:4000:4000"
+         - "0.0.0.0:12000:12000/udp"
+         - "0.0.0.0:13000:13000"
+       depends_on:
+         - geth
    ```
 
 4. Save and Close the `docker-compose.yml` file.
@@ -139,13 +139,13 @@ IdleTimeout = 1200000000000
 
    ```bash
    cd ~/goerli-node/
-   docker compose --env-file /root/goerli-node/.env -f /root/goerli-node/docker-compose.yml up -d
+   docker-compose --env-file /root/goerli-node/.env -f /root/goerli-node/docker-compose.yml up -d
    ```
 
 2. Check the logs of the prysm service to monitor the synchronization progress:
 
    ```bash
-   docker compose --env-file /root/goerli-node/.env -f /root/goerli-node/docker-compose.yml logs -f prysm --tail 20
+   docker-compose --env-file /root/goerli-node/.env -f /root/goerli-node/docker-compose.yml logs --tail 20 -f prysm
    ```
 
 - Wait for the initial sync to complete. You will see log messages similar to the following indicating the progress:
@@ -157,7 +157,7 @@ IdleTimeout = 1200000000000
 3. Check the logs of the geth service to monitor the initial download and sync progress:
 
    ```bash
-   docker compose --env-file /root/goerli-node/.env -f /root/goerli-node/docker-compose.yml logs -f geth --tail 20
+   docker-compose --env-file /root/goerli-node/.env -f /root/goerli-node/docker-compose.yml logs --tail 20 -f geth 
    ```
 
 - This process may take a couple of hours. Look for log messages similar to the following indicating the progress:
